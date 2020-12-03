@@ -1,0 +1,21 @@
+<launch>
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="align_depth"         value="true"/>
+    </include>
+    <node pkg="tf" type="static_transform_publisher" name="rs_camera" args="0.28 0 0.35 1 0 0 0 base_link  camera_link 50"/>
+	<node pkg="depth2pointcloud_server" type="depth2pointcloud_server_node" name="depth2pointcloud_server" output="screen">
+		<param name="depth_image" type="string" value="/camera/depth/image_rect_raw"/>	
+		<param name="camera_info" type="string" value="/camera/depth/camera_info" />
+        <param name="downsample_scale" type="int" value="4" />
+        <param name="leaf_size" type="double" value="0.02" />
+        <param name="remove_outlier" type="bool" value="true" />
+		<param name="remove_ground" type="bool" value="false" />
+	</node>
+	<node pkg="local_octomap_server" type="local_octomap_server_node" name="local_octomap_server" output="screen">
+		<param name="pointcloud" type="string" value="/depth2pointcloud_server/pointcloud" />
+		<param name="base_frame" type="string" value="base_link" />
+        <param name="max_range" type="double" value="0.2" />
+        <param name="leaf_size" type="double" value="0.02" />
+	</node>
+</launch>
+
